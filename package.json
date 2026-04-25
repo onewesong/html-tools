@@ -9,7 +9,7 @@
     "lint": "npm run lint:html && npm run lint:css && npm run lint:js",
     "lint:html": "htmlhint \"**/*.html\" --ignore \"**/ByteDanceVerify.html,**/baidu_verify_*.html,**/js-playground.html,**/code-screenshot.html,**/wave-bg.html\"",
     "lint:css": "stylelint \"**/*.html\" --custom-syntax postcss-html",
-    "lint:js": "eslint \"**/*.html\"",
+    "lint:js": "eslint \"**/*.html\" \"assets/js/**/*.js\"",
     "lint:fix": "npm run lint:css -- --fix",
     "format": "prettier --write \"**/*.{html,js,json,md}\"",
     "format:check": "prettier --check \"**/*.{html,js,json,md}\"",

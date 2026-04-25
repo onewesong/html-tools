@@ -10,9 +10,9 @@ export default [
   // Base config for all files
   js.configs.recommended,
 
-  // HTML files configuration
+  // HTML files + extracted assets/js (same project conventions)
   {
-    files: ['**/*.html'],
+    files: ['**/*.html', 'assets/js/**/*.js'],
     plugins: {
       html
     },

@@ -1,6 +1,6 @@
 // Service Worker for WebUtils PWA
-// Updated: 700+ tools version with performance optimizations
-const CACHE_NAME = 'webutils-v2';
+// Updated: 1001+ tools, externalized assets
+const CACHE_NAME = 'webutils-v3';
 const OFFLINE_URL = './offline.html';
 
 // Assets to cache immediately on install
@@ -12,7 +12,9 @@ const PRECACHE_ASSETS = [
   '/favicon-32x32.png',
   '/favicon-16x16.png',
   '/apple-touch-icon.png',
-  '/manifest.json'
+  '/manifest.json',
+  '/assets/css/main.css',
+  '/assets/js/main.js'
 ];
 
 // Install event - precache core assets

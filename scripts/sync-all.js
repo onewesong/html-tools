@@ -64,8 +64,9 @@ function toolToJsLine(tool) {
   const desc = escapeString(tool.description || tool.name);
   const icon = escapeString(tool.icon || '🔧');
   const keywords = escapeString(tool.keywords || tool.name);
+  const pop = Number.isFinite(tool.popularity) ? tool.popularity : 0;
 
-  return `      { url: '${url}', category: '${category}', name: '${name}', desc: '${desc}', icon: '${icon}', keywords: '${keywords}' },`;
+  return `      { url: '${url}', category: '${category}', name: '${name}', desc: '${desc}', icon: '${icon}', keywords: '${keywords}', pop: ${pop} },`;
 }
 
 /**
