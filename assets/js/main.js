@@ -11,6 +11,60 @@ const searchResultsCount = document.getElementById('search-results-count');
 let currentCategory = 'all';
 let toolCards = [];
 
+const CATEGORY_PARAM = 'category';
+
+function isKnownCategory(category) {
+  return CATEGORIES.some((cat) => cat.id === category);
+}
+
+function getCategoryFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const category = params.get(CATEGORY_PARAM);
+  if (category && isKnownCategory(category)) {
+    return category;
+  }
+
+  const hashCategory = window.location.hash.slice(1);
+  if (hashCategory && isKnownCategory(hashCategory)) {
+    return hashCategory;
+  }
+
+  return 'all';
+}
+
+function updateCategoryUrl(category) {
+  const url = new URL(window.location.href);
+  const hashCategory = url.hash.slice(1);
+  if (hashCategory && isKnownCategory(hashCategory)) {
+    url.hash = '';
+  }
+
+  if (category === 'all') {
+    url.searchParams.delete(CATEGORY_PARAM);
+  } else {
+    url.searchParams.set(CATEGORY_PARAM, category);
+  }
+
+  if (url.href !== window.location.href) {
+    history.pushState({ category }, '', url);
+  }
+}
+
+function setCategory(category, options = {}) {
+  const selectedCategory = isKnownCategory(category) ? category : 'all';
+  const selectedButton = categoriesContainer.querySelector(
+    '.category-btn[data-category="' + selectedCategory + '"]'
+  );
+  currentCategory = selectedButton ? selectedCategory : 'all';
+  document.querySelectorAll('.category-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.category === currentCategory);
+  });
+  if (options.updateUrl) {
+    updateCategoryUrl(currentCategory);
+  }
+  filterTools();
+}
+
 // ==================== 主题管理 ====================
 const savedTheme = localStorage.getItem('theme') || 'dark';
 if (savedTheme === 'light') {
@@ -90,13 +144,17 @@ function renderCategories() {
     (cat) => cat.id === 'all' || cat.id === 'favorites' || categoryCounts[cat.id]
   );
 
+  if (!activeCategories.some((cat) => cat.id === currentCategory)) {
+    currentCategory = 'all';
+  }
+
   // Update stats
   document.getElementById('tool-count').textContent = TOOLS.length;
   document.getElementById('category-count').textContent = activeCategories.length - 2; // Exclude 'all' and 'favorites'
 
   activeCategories.forEach((cat) => {
     const btn = document.createElement('button');
-    btn.className = 'category-btn' + (cat.id === 'all' ? ' active' : '');
+    btn.className = 'category-btn' + (cat.id === currentCategory ? ' active' : '');
     btn.dataset.category = cat.id;
 
     const icon = document.createElement('span');
@@ -116,10 +174,7 @@ function renderCategories() {
     }
 
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.category-btn').forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentCategory = cat.id;
-      filterTools();
+      setCategory(cat.id, { updateUrl: true });
     });
     categoriesContainer.appendChild(btn);
   });
@@ -660,6 +715,10 @@ function filterTools() {
 // ==================== 事件绑定 ====================
 searchInput.addEventListener('input', filterTools);
 
+window.addEventListener('popstate', () => {
+  setCategory(getCategoryFromUrl());
+});
+
 document.addEventListener('keydown', (e) => {
   if (e.key === '/' && document.activeElement !== searchInput) {
     e.preventDefault();
@@ -727,7 +786,11 @@ function setupCategoriesExpand() {
 }
 
 // ==================== 初始化 ====================
+currentCategory = getCategoryFromUrl();
 setupLazyLoading();
 renderCategories();
 renderTools();
+if (currentCategory !== 'all') {
+  filterTools();
+}
 setupCategoriesExpand();
